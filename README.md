@@ -133,17 +133,59 @@ flowchart TD
 
 ---
 
-## 🖼️ Hình Ảnh Minh Họa (Screenshots & Demo)
+## 🖼️ Hình Ảnh Minh Họa Hệ Thống (Screenshots & System Showcase)
 
-> 💡 *Dưới đây là một số hình ảnh thực tế từ hệ thống:*
+### 1. 📊 Bảng Điều Khiển & Trợ Lý Giọng Nói (Dashboard & Voice Assistant)
+> Điều khiển đèn, quạt, servo cửa chính theo thời gian thực qua giao thức MQTT. Tích hợp micro nhận lệnh bằng giọng nói Tiếng Việt và theo dõi trạng thái Broker online.
 
-| Giám Sát Cảnh Báo Kẻ Xâm Nhập (Intruder Alert) | Nhận Diện Khuôn Mặt AI (AI Face Unlock) |
+<p align="center">
+  <img src="docs/images/02_dashboard_control.png" alt="Bảng Điều Khiển & Trợ Lý Giọng Nói" width="95%" />
+</p>
+
+---
+
+### 2. 🤖 AI Nhận Diện Khuôn Mặt & Bảo Mật 2 Lớp (AI Face Unlock & 2FA PIN)
+> Camera AI quét khuôn mặt chủ nhà thời gian thực, mở khóa cửa tự động. Hỗ trợ popup xác thực mã PIN bảo mật 2 lớp cùng kịch bản Auto-Mitigation tự động bật quạt, hú còi khi phát hiện nguy cơ rò rỉ khí gas.
+
+<p align="center">
+  <img src="docs/images/03_face_recognition_2fa.jpg" alt="AI Face Recognition & 2FA PIN" width="95%" />
+</p>
+
+---
+
+### 3. 📈 Phân Tích Dữ Liệu Cảm Biến Thời Gian Thực (Telemetry Analytics)
+> Biểu đồ đường động (Chart.js) cập nhật liên tục nồng độ khí Gas MQ-2 (PPM) và nhiệt độ môi trường, giúp theo dõi biến động môi trường sống trực quan.
+
+<p align="center">
+  <img src="docs/images/04_telemetry_chart.png" alt="Biểu đồ phân tích dữ liệu cảm biến" width="95%" />
+</p>
+
+---
+
+### 4. ⏰ Lên Lịch Tự Động Hóa Thiết Bị (Cron Triggers & Schedules)
+> Thiết lập lịch trình bật/tắt thiết bị thông minh theo thời gian mong muốn với cơ chế Cron Scheduler chạy ngầm.
+
+<p align="center">
+  <img src="docs/images/05_schedules.png" alt="Lên Lịch Tự Động Hóa Thiết Bị" width="95%" />
+</p>
+
+---
+
+### 5. 👥 Quản Trị Hệ Thống & Nhật Ký Hoạt Động (RBAC & Audit Trail)
+
+| Quản Lý Tài Khoản Quản Trị (RBAC) | Nhật Ký & Lịch Sử Hoạt Động (Audit Trail) |
 | :---: | :---: |
-| ![Intruder Detection](docs/images/intruder_sample.jpg) | *(Chèn ảnh chụp màn hình nhận diện khuôn mặt)* |
+| ![Quản lý tài khoản](docs/images/06_user_management.png) | ![Nhật ký hoạt động](docs/images/07_audit_logs.png) |
+| *Phân quyền Administrator và User Member* | *Lọc sự kiện, thời gian và chi tiết tương tác* |
 
-| Giao Diện Web Dashboard Điều Khiển | Mô Hình Phần Cứng ESP32 Thực Tế |
+---
+
+### 6. 🚨 Cảnh Báo Phát Hiện Kẻ Lạ & Xác Thực Đăng Nhập
+
+| Bắt Ảnh Kẻ Đột Nhập (Intruder Alert) | Giao Diện Xác Thực & Đăng Nhập |
 | :---: | :---: |
-| *(Chèn ảnh giao diện Dashboard Web)* | *(Chèn ảnh chụp bảng mạch ESP32 và cảm biến)* |
+| ![Intruder Alert](docs/images/08_intruder_alert.jpg) | ![Login](docs/images/01_login.png) |
+| *Tự động chụp ảnh kẻ lạ gửi về Server & Email* | *Đăng nhập bảo mật Spring Security* |
 
 ---
 
