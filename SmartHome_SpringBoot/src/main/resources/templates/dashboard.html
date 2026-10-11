@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHome IoT Dashboard - Điều Khiển Nhà Thông Minh</title>
+    <!-- Taste-Skill-v1 CSS Design System -->
+    <link rel="stylesheet" th:href="@{/css/style.css(v=2.1)}">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation Fragment -->
+        <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- TOP BAR: Welcome & Status Overview -->
+                <div class="top-welcome-bar">
+                    <div>
+                        <h1 class="welcome-title">Bảng Điều Khiển Trung Tâm</h1>
+                        <p class="welcome-sub">
+                            Xin chào, <span class="user-badge-name" sec:authentication="name">User</span>! Hệ thống an ninh và cảm biến IoT đang hoạt động ổn định.
+                        </p>
+                    </div>
+
+                    <div class="top-pills-group">
+                        <div class="system-pill">
+                            <span class="status-dot" style="color: var(--status-success);"></span>
+                            <span>Hệ thống: <strong>Bình Thường</strong></span>
+                        </div>
+                        <div class="system-pill">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <span>ESP32: <strong style="color: var(--accent-cyan);">Online</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASYMMETRIC BENTO GRID 2.0 -->
+                <div class="bento-grid">
+                    
+                    <!-- ===================================================
+                         ROW 1 - LEFT (8 COLS): HERO GAS & ENVIRONMENT SAFETY
+                         =================================================== -->
+                    <div class="col-8">
+                        <div class="card hero-gas-card" id="heroGasCard" th:classappend="${latestSensor != null && latestSensor.gasLevel != null && latestSensor.gasLevel > 400.0} ? 'gas-alert' : ''">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    </svg>
+                                    Hệ Thống An Toàn Khí Gas (MQ-2)
+                                </span>
+                                <span class="tag tag-warning">Cảm Biến Khí Gas & Khói</span>
+                            </div>
+
+                            <div class="gas-metric-layout">
+                                <!-- Main Big Gas Value Display -->
+                                <div class="gas-main-display">
+                                    <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Nồng độ hiện tại</div>
+                                    <div class="gas-value-large">
+                                        <span class="sensor-num" id="valGas" th:text="${latestSensor != null && latestSensor.gasLevel != null ? #numbers.formatDecimal(latestSensor.gasLevel, 1, 0) : '--'}">120</span>
+                                        <span class="gas-unit-tag">PPM</span>
+                                    </div>
+                                    <div style="font-size: 0.82rem; color: var(--text-dim); margin-top: 0.25rem;">Ngưỡng an toàn: &lt; 400 PPM</div>
+                                </div>
+
+                                <!-- Status Badge & Auto-mitigation details -->
+                                <div class="gas-status-details">
+                                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.4rem;">Trạng thái giám sát:</div>
+                                    <div id="gasStatusBadge" 
+                                         class="tag" 
+                                         th:classappend="${latestSensor != null && latestSensor.gasLevel != null && latestSensor.gasLevel > 400.0} ? 'tag-denied' : 'tag-success'"
+                                         th:text="${latestSensor != null && latestSensor.gasLevel != null && latestSensor.gasLevel > 400.0} ? 'PHÁT HIỆN RÒ RỈ GAS NGUY HIỂM!' : 'Mức Gas An Toàn'"
+                                         style="font-size: 1rem; padding: 0.45rem 1rem;">
+                                        Mức Gas An Toàn
+                                    </div>
+
+                                    <div class="auto-mitigation-box">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; color: var(--accent-cyan); font-weight: 600; margin-bottom: 0.25rem;">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                            Kịch Bản Auto-Mitigation (Tự Động Bảo Vệ)
+                                        </div>
+                                        Khi nồng độ vượt <strong>400 PPM</strong>, hệ thống tự động <strong>Bật quạt tản khí</strong>, <strong>Mở toàn bộ cửa</strong> và <strong>Kích hoạt còi hú</strong> để đảm bảo an toàn tuyệt đối.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Environmental Micro Bar -->
+                            <div style="margin-top: 1.5rem; pt-4; border-top: 1px solid var(--border-glass-subtle); display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Nhiệt độ</div>
+                                        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main);"><span id="valTemp" th:text="${latestSensor != null && latestSensor.temperature != null ? #numbers.formatDecimal(latestSensor.temperature, 1, 1) : '--'}">--</span>°C</div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: var(--status-success);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Độ ẩm</div>
+                                        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main);"><span id="valHum" th:text="${latestSensor != null && latestSensor.humidity != null ? #numbers.formatDecimal(latestSensor.humidity, 1, 1) : '--'}">--</span>%</div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); display: flex; align-items: center; justify-content: center; color: var(--status-danger);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Cảm biến lửa</div>
+                                        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main);">
+                                            <span id="valFlame" 
+                                                  th:style="${latestSensor != null && latestSensor.flameDetected ? 'color: #f43f5e;' : ''}" 
+                                                  th:text="${latestSensor != null && latestSensor.flameDetected ? 'Có lửa' : 'Không có'}">Không có</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================
+                         ROW 1 - RIGHT (4 COLS): AI LIVE CAMERA & SECURITY
+                         =================================================== -->
+                    <div class="col-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    AI Vision Nhận Diện
+                                </span>
+                                <span class="tag tag-success">Active Stream</span>
+                            </div>
+
+                            <!-- Live Camera Video Bezel -->
+                            <div class="camera-monitor-bezel">
+                                <div class="camera-live-badge">
+                                    <span class="live-indicator-dot"></span>
+                                    <span>Live Feed</span>
+                                </div>
+                                <img id="aiCameraFeed" 
+                                     class="camera-feed-img"
+                                     src="http://localhost:5000/video_feed" 
+                                     onerror="this.onerror=null; this.src='/images/camera_offline.png'; this.alt='Camera Offline';" 
+                                     alt="AI Live Security Feed">
+                            </div>
+
+                            <!-- AI Detection Status Metadata -->
+                            <div class="ai-meta-panel">
+                                <div id="aiFaceStatus" class="ai-face-status">Hệ thống đang ở chế độ chờ...</div>
+                                <div id="aiFaceName" class="ai-face-name">--</div>
+                                
+                                <button id="btnScanFace" class="btn btn-action" style="margin-top: 15px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                                        <circle cx="12" cy="13" r="3"/>
+                                    </svg>
+                                    Kích Hoạt Quét Camera
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================
+                         ROW 2 - LEFT (5 COLS): DEVICE CONTROL HUB
+                         =================================================== -->
+                    <div class="col-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="20" height="12" x="2" y="6" rx="2"/>
+                                        <circle cx="12" cy="12" r="2"/>
+                                        <path d="M6 12h.01M18 12h.01"/>
+                                    </svg>
+                                    Bảng Điều Khiển Thiết Bị
+                                </span>
+                                <span class="tag tag-success">MQTT Hub</span>
+                            </div>
+
+                            <div class="device-list">
+                                <!-- Đèn chiếu sáng -->
+                                <div class="device-item" th:classappend="${deviceStates.light} ? 'active' : ''">
+                                    <div class="device-info">
+                                        <div class="device-icon">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                                                <path d="M9 18h6M10 22h4"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="device-name">Đèn Chiếu Sáng</div>
+                                            <div class="device-status" th:text="${deviceStates.light} ? 'Đang BẬT' : 'Đang TẮT'">Đang TẮT</div>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="device-switch-input" data-device="light" th:checked="${deviceStates.light}">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Quạt làm mát -->
+                                <div class="device-item" th:classappend="${deviceStates.fan} ? 'active' : ''">
+                                    <div class="device-info">
+                                        <div class="device-icon">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 12c-2 0-3-1.5-3-3s1.5-3 3-3 3 1.5 3 3-1 3-3 3z"/>
+                                                <path d="M12 12c0 2-1.5 3-3 3s-3-1.5-3-3 1.5-3 3-3 3 1 3 3z"/>
+                                                <path d="M12 12c2 0 3 1.5 3 3s-1.5 3-3 3-3-1.5-3-3 1-3 3-3z"/>
+                                                <path d="M12 12c0-2 1.5-3 3-3s3 1.5 3 3-1.5 3-3 3-3-1-3-3z"/>
+                                                <circle cx="12" cy="12" r="2"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="device-name">Quạt Làm Mát</div>
+                                            <div class="device-status" th:text="${deviceStates.fan} ? 'Đang BẬT' : 'Đang TẮT'">Đang TẮT</div>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="device-switch-input" data-device="fan" th:checked="${deviceStates.fan}">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Cửa chính (Servo) -->
+                                <div class="device-item" th:classappend="${deviceStates.door} ? 'active' : ''">
+                                    <div class="device-info">
+                                        <div class="device-icon">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14"/>
+                                                <path d="M2 20h20"/>
+                                                <circle cx="14" cy="12" r="1"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="device-name">Cửa Chính (Servo)</div>
+                                            <div class="device-status" th:text="${deviceStates.door} ? 'Đang MỞ' : 'Đang ĐÓNG'">Đang ĐÓNG</div>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" class="device-switch-input" data-device="door" th:checked="${deviceStates.door}">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================
+                         ROW 2 - MIDDLE (4 COLS): VOICE ASSISTANT
+                         =================================================== -->
+                    <div class="col-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="22"/>
+                                    </svg>
+                                    Trợ Lý Giọng Nói
+                                </span>
+                                <span class="tag tag-success">Web Speech API</span>
+                            </div>
+
+                            <div class="voice-box">
+                                <button id="micBtn" class="mic-btn" title="Nhấn để nói câu lệnh">
+                                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="22"/>
+                                    </svg>
+                                </button>
+
+                                <div id="voiceStatus" class="voice-status">Nhấn micro để ra lệnh</div>
+                                <div id="voiceTranscript" class="voice-transcript">Ví dụ: "Bật đèn", "Mở quạt"...</div>
+
+                                <div class="voice-hints">
+                                    <strong style="color: var(--text-main);">Lệnh hỗ trợ tiếng Việt:</strong>
+                                    <ul>
+                                        <li>"Bật / Tắt đèn"</li>
+                                        <li>"Bật / Tắt quạt"</li>
+                                        <li>"Mở / Đóng cửa"</li>
+                                        <li>"Báo động"</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================
+                         ROW 2 - RIGHT (3 COLS): SYSTEM OVERVIEW & SHORTCUTS
+                         =================================================== -->
+                    <div class="col-3">
+                        <div class="card" style="justify-content: space-between;">
+                            <div>
+                                <div class="card-header">
+                                    <span class="card-title">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="18" height="18" x="3" y="3" rx="2"/>
+                                            <path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/>
+                                        </svg>
+                                        Hệ Thống
+                                    </span>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.85rem;">
+                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-glass-subtle); padding-bottom: 0.5rem;">
+                                        <span style="color: var(--text-dim);">Broker MQTT:</span>
+                                        <span style="color: var(--accent-cyan); font-weight: 600;">EMQX Public</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-glass-subtle); padding-bottom: 0.5rem;">
+                                        <span style="color: var(--text-dim);">Port Kết Nối:</span>
+                                        <span class="font-mono" style="color: var(--text-main);">1883 TCP</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-glass-subtle); padding-bottom: 0.5rem;">
+                                        <span style="color: var(--text-dim);">Camera Feed:</span>
+                                        <span class="font-mono" style="color: var(--status-success);">Port 5000</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem;">
+                                        <span style="color: var(--text-dim);">Voice Recognition:</span>
+                                        <span style="color: var(--text-main);">Tiếng Việt</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                                <a th:href="@{/schedules}" class="btn" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-glass); color: var(--text-main); font-size: 0.85rem; padding: 0.65rem 1rem;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    Cài Đặt Hẹn Giờ
+                                </a>
+                                <a th:href="@{/history}" class="btn" style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-glass); color: var(--text-main); font-size: 0.85rem; padding: 0.65rem 1rem;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                                    Xem Lịch Sử Log
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================
+                         ROW 3 (12 COLS): RECENT ACTIVITY LOGS TABLE
+                         =================================================== -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                    </svg>
+                                    Nhật Ký Hoạt Động Gần Đây
+                                </span>
+                                <a th:href="@{/history}" style="color: var(--accent-cyan); text-decoration: none; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem; transition: var(--transition-fast);" onmouseover="this.style.transform='translateX(4px)'" onmouseout="this.style.transform='translateX(0)'">
+                                    <span>Xem tất cả</span>
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                </a>
+                            </div>
+
+                            <div class="log-table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Thời Gian</th>
+                                            <th>Loại Sự Kiện</th>
+                                            <th>Chi Tiết</th>
+                                            <th>Đối Tượng / Nguồn</th>
+                                            <th>Trạng Thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentLogBody">
+                                        <tr th:each="log : ${recentLogs}">
+                                            <td class="font-mono" style="color: var(--text-muted); font-size: 0.85rem;" th:text="${#temporals.format(log.timestamp, 'HH:mm:ss dd/MM/yyyy')}">10:30:15 04/09/2026</td>
+                                            <td>
+                                                <span class="tag"
+                                                      th:classappend="${log.eventType == 'ALARM' ? 'tag-denied' : (log.eventType == 'DOOR_OPEN' || log.eventType == 'FACE_RECOGNITION' ? 'tag-warning' : 'tag-success')}"
+                                                      th:text="${log.eventType}">DOOR_OPEN</span>
+                                            </td>
+                                            <td style="color: var(--text-main);" th:text="${log.details}">Cửa chính được mở</td>
+                                            <td style="color: var(--text-muted);" th:text="${log.personName != null ? log.personName : '--'}">Admin</td>
+                                            <td>
+                                                <span class="tag"
+                                                      th:classappend="${log.status == 'SUCCESS' ? 'tag-success' : (log.status == 'WARNING' ? 'tag-warning' : 'tag-denied')}"
+                                                      th:text="${log.status}">SUCCESS</span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(recentLogs)}">
+                                            <td colspan="5" style="text-align: center; color: var(--text-dim); padding: 3rem;">Chưa có dữ liệu nhật ký</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================================================
+                         ROW 3 (12 COLS): DATA ANALYTICS (CHART)
+                         =================================================== -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                    </svg>
+                                    Phân Tích Dữ Liệu Thời Gian Thực
+                                </span>
+                            </div>
+                            <div style="height: 300px; width: 100%; position: relative;">
+                                <canvas id="sensorChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /bento-grid -->
+
+            </div><!-- /container -->
+        </main>
+    </div>
+
+    <!-- Frontend Scripts -->
+    <script th:src="@{/js/voice_recognition.js}"></script>
+    <script th:src="@{/js/realtime_dashboard.js(v=2.0)}"></script>
+</body>
+</html>

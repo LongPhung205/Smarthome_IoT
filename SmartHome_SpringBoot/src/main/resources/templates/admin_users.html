@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tài Khoản Hệ Thống - SmartHome IoT</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v=2.1)}">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation Fragment -->
+        <div th:replace="~{fragments/sidebar :: sidebar('admin_users')}"></div>
+        
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- TOP HEADER -->
+                <div class="top-welcome-bar">
+                    <div>
+                        <h1 class="welcome-title">Quản Lý Tài Khoản Quản Trị</h1>
+                        <p class="welcome-sub">Phân quyền, cấp phát mã PIN bảo mật và quản lý tài khoản người dùng hệ thống.</p>
+                    </div>
+                </div>
+
+                <div class="bento-grid">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                    Danh Sách Tài Khoản Hệ Thống
+                                </span>
+                                <button class="btn" style="width: auto; padding: 0.6rem 1.25rem; font-size: 0.88rem;" onclick="openUserModal(null, '', '', 'ROLE_USER', '')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Thêm Tài Khoản Mới
+                                </button>
+                            </div>
+
+                            <div class="log-table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên Đăng Nhập</th>
+                                            <th>Họ và Tên</th>
+                                            <th>Email Nhận Tin</th>
+                                            <th>Phân Quyền</th>
+                                            <th>Ngày Khởi Tạo</th>
+                                            <th style="text-align: right;">Thao Tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="user : ${users}">
+                                            <td class="font-mono" style="color: var(--text-dim);" th:text="${user.id}">1</td>
+                                            <td class="font-mono" style="font-weight: 600; color: var(--accent-cyan);" th:text="${user.username}">admin</td>
+                                            <td style="color: var(--text-main); font-weight: 500;" th:text="${user.fullName}">Quản Trị Viên</td>
+                                            <td class="font-mono" style="color: var(--accent-cyan); font-size: 0.88rem;" th:text="${user.email != null && !user.email.isEmpty() ? user.email : '--'}">admin@gmail.com</td>
+                                            <td>
+                                                <span class="tag" 
+                                                      th:classappend="${user.role == 'ROLE_ADMIN'} ? 'tag-denied' : 'tag-success'" 
+                                                      th:text="${user.role == 'ROLE_ADMIN' ? 'Administrator' : 'User Member'}">Admin</span>
+                                            </td>
+                                            <td class="font-mono" style="color: var(--text-muted); font-size: 0.85rem;" th:text="${#temporals.format(user.createdAt, 'HH:mm dd/MM/yyyy')}">01/01/2026</td>
+                                            <td style="text-align: right;">
+                                                <button class="action-btn" title="Chỉnh sửa" th:onclick="openUserModal([[${user.id}]], [[${user.username}]], [[${user.fullName}]], [[${user.role}]], [[${user.email}]])">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                                                    </svg>
+                                                </button>
+                                                <button class="action-btn btn-delete" title="Xóa tài khoản" th:onclick="deleteUser([[${user.id}]], [[${user.username}]])">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /bento-grid -->
+
+            </div><!-- /container -->
+        </main>
+    </div>
+
+    <script>
+        function openUserModal(id, username, fullName, role, email) {
+            const isEdit = !!id;
+            const title = isEdit ? 'Cập nhật tài khoản' : 'Thêm tài khoản mới';
+            
+            Swal.fire({
+                title: title,
+                background: '#ffffff',
+                color: '#0f172a',
+                confirmButtonColor: '#0284c7',
+                cancelButtonColor: '#64748b',
+                html: `
+                    <div style="display:flex; flex-direction:column; gap: 12px; margin-top: 1rem; text-align: left;">
+                        <div>
+                            <label style="font-size: 0.8rem; color: #475569; margin-bottom: 4px; display:block;">Tên đăng nhập</label>
+                            <input type="text" id="username" class="swal2-input" style="margin:0; width:100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px;" placeholder="Tên đăng nhập" value="${username || ''}" ${isEdit ? 'disabled' : ''}>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #475569; margin-bottom: 4px; display:block;">Họ và Tên</label>
+                            <input type="text" id="fullName" class="swal2-input" style="margin:0; width:100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px;" placeholder="Họ và Tên" value="${fullName || ''}">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #475569; margin-bottom: 4px; display:block;">Email nhận thông báo sự cố</label>
+                            <input type="email" id="email" class="swal2-input" style="margin:0; width:100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px;" placeholder="admin@gmail.com" value="${email || ''}">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #475569; margin-bottom: 4px; display:block;">Mật khẩu</label>
+                            <input type="password" id="password" class="swal2-input" style="margin:0; width:100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px;" placeholder="${isEdit ? 'Mật khẩu mới (bỏ trống nếu giữ nguyên)' : 'Mật khẩu'}">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #475569; margin-bottom: 4px; display:block;">Mã PIN số</label>
+                            <input type="password" id="pinHash" class="swal2-input" style="margin:0; width:100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px;" placeholder="${isEdit ? 'Mã PIN mới (bỏ trống nếu giữ nguyên)' : 'Mã PIN'}">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #475569; margin-bottom: 4px; display:block;">Phân quyền</label>
+                            <select id="role" class="swal2-input" style="margin:0; width:100%; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 8px;">
+                                <option value="ROLE_USER" ${role === 'ROLE_USER' ? 'selected' : ''}>User Member</option>
+                                <option value="ROLE_ADMIN" ${role === 'ROLE_ADMIN' ? 'selected' : ''}>Administrator</option>
+                            </select>
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Lưu Thông Tin',
+                cancelButtonText: 'Hủy Bỏ',
+                preConfirm: () => {
+                    const data = {
+                        username: document.getElementById('username').value,
+                        fullName: document.getElementById('fullName').value,
+                        email: document.getElementById('email').value.trim(),
+                        password: document.getElementById('password').value,
+                        pinHash: document.getElementById('pinHash').value,
+                        role: document.getElementById('role').value
+                    };
+                    if (!isEdit && (!data.username || !data.password || !data.pinHash)) {
+                        Swal.showValidationMessage('Vui lòng nhập đủ thông tin (Tên đăng nhập, Mật khẩu, PIN)');
+                    }
+                    return data;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    saveUser(id, result.value);
+                }
+            });
+        }
+
+        function saveUser(id, data) {
+            const url = id ? '/api/accounts/' + id : '/api/accounts';
+            const method = id ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Dữ liệu đã được cập nhật thành công.',
+                        icon: 'success',
+                        background: '#ffffff',
+                        color: '#0f172a',
+                        confirmButtonColor: '#0ea5e9'
+                    }).then(() => location.reload());
+                } else {
+                    response.json().then(err => Swal.fire({
+                        title: 'Lỗi',
+                        text: err.error || 'Có lỗi xảy ra',
+                        icon: 'error',
+                        background: '#ffffff',
+                        color: '#0f172a'
+                    })).catch(() => Swal.fire({
+                        title: 'Lỗi',
+                        text: 'Có lỗi xảy ra',
+                        icon: 'error',
+                        background: '#ffffff',
+                        color: '#0f172a'
+                    }));
+                }
+            }).catch(err => Swal.fire({
+                title: 'Lỗi',
+                text: err.message,
+                icon: 'error',
+                background: '#ffffff',
+                color: '#0f172a'
+            }));
+        }
+
+        function deleteUser(id, username) {
+            Swal.fire({
+                title: 'Xác nhận xóa tài khoản?',
+                text: "Bạn có chắc chắn muốn xóa tài khoản " + username + "? Thao tác này không thể hoàn tác.",
+                icon: 'warning',
+                background: '#ffffff',
+                color: '#0f172a',
+                showCancelButton: true,
+                confirmButtonColor: '#f43f5e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Vâng, xóa tài khoản!',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/api/accounts/' + id, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                title: 'Đã xóa!',
+                                text: 'Tài khoản đã được xóa bỏ khỏi hệ thống.',
+                                icon: 'success',
+                                background: '#ffffff',
+                                color: '#0f172a',
+                                confirmButtonColor: '#0ea5e9'
+                            }).then(() => location.reload());
+                        } else {
+                            response.json().then(err => Swal.fire({
+                                title: 'Lỗi',
+                                text: err.error || 'Không thể xóa',
+                                icon: 'error',
+                                background: '#ffffff',
+                                color: '#0f172a'
+                            })).catch(() => Swal.fire({
+                                title: 'Lỗi',
+                                text: 'Có lỗi xảy ra',
+                                icon: 'error',
+                                background: '#ffffff',
+                                color: '#0f172a'
+                            }));
+                        }
+                    }).catch(err => Swal.fire({
+                        title: 'Lỗi',
+                        text: err.message,
+                        icon: 'error',
+                        background: '#0f172a',
+                        color: '#f8fafc'
+                    }));
+                }
+            });
+        }
+    </script>
+</body>
+</html>

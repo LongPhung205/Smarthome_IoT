@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Dữ Liệu Khuôn Mặt AI - SmartHome IoT</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v=2.1)}">
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation Fragment -->
+        <div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+        
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- TOP HEADER -->
+                <div class="top-welcome-bar">
+                    <div>
+                        <h1 class="welcome-title">Dữ Liệu Khuôn Mặt AI Vision</h1>
+                        <p class="welcome-sub">Nạp ảnh khuôn mặt thành viên để AI nhận diện và tự động mở cửa.</p>
+                    </div>
+                </div>
+
+                <div class="bento-grid">
+                    
+                    <!-- Form Upload Thêm Mới (12 COLS) -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <line x1="19" y1="8" x2="19" y2="14"/>
+                                        <line x1="22" y1="11" x2="16" y2="11"/>
+                                    </svg>
+                                    Đăng Ký Khuôn Mặt Mới
+                                </span>
+                                <span class="tag tag-success">Face Encoding Sync</span>
+                            </div>
+
+                            <div th:if="${message}" class="tag tag-success" style="font-size: 0.95rem; padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; display: block;" th:text="${message}"></div>
+                            <div th:if="${error}" class="tag tag-denied" style="font-size: 0.95rem; padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; display: block;" th:text="${error}"></div>
+
+                            <div style="background: rgba(240, 249, 255, 0.6); border: 1px dashed rgba(14, 165, 233, 0.35); padding: 2.25rem; border-radius: var(--radius-xl); text-align: center;">
+                                <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.5rem; max-width: 550px; margin-left: auto; margin-right: auto;">
+                                    Tải lên ảnh chân dung rõ mặt của chủ nhà (định dạng JPG hoặc PNG). Hệ thống Python AI sẽ tự động giải mã vector và lưu vào bộ nhớ.
+                                </p>
+                                
+                                <form th:action="@{/api/users/upload}" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 360px; margin: 0 auto;">
+                                    <div style="width: 100%;">
+                                        <label class="form-label" style="text-align: left;">Tên Người Nhà (Không dấu)</label>
+                                        <input type="text" name="name" class="form-control" placeholder="Ví dụ: phung_van_long" required pattern="[a-zA-Z0-9_]+" title="Chỉ sử dụng chữ không dấu, số và dấu gạch dưới">
+                                    </div>
+                                    <div style="width: 100%;">
+                                        <label class="form-label" style="text-align: left;">File Hình Ảnh Chân Dung</label>
+                                        <input type="file" name="file" class="form-control" accept="image/jpeg, image/png" required style="padding: 0.6rem 0.8rem;">
+                                    </div>
+                                    <button type="submit" class="btn" style="margin-top: 0.5rem;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="17 8 12 3 7 8"/>
+                                            <line x1="12" y1="3" x2="12" y2="15"/>
+                                        </svg>
+                                        Nạp Dữ Liệu Lên AI Vision
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách Dataset (12 COLS) -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                                        <circle cx="9" cy="9" r="2"/>
+                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                                    </svg>
+                                    Kho Dữ Liệu Đã Nạp (Dataset)
+                                </span>
+                                <span class="tag tag-warning" th:text="${#lists.size(users)} + ' Thành viên'">0 Thành viên</span>
+                            </div>
+
+                            <div class="user-grid">
+                                <div th:each="user : ${users}" class="user-card">
+                                    <img th:src="@{/api/users/image/{filename}(filename=${user.filename})}" class="user-avatar" alt="Avatar">
+                                    <div class="user-name" th:text="${user.name}">Phùng Văn Long</div>
+                                    <div class="font-mono" style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 1.25rem;" th:text="${user.filename}">phung_van_long.jpg</div>
+                                    
+                                    <form th:action="@{/api/users/delete/{filename}(filename=${user.filename})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khuôn mặt này?');">
+                                        <button type="submit" class="btn" style="background: rgba(244, 63, 94, 0.15); color: var(--status-danger); border-color: rgba(244, 63, 94, 0.3); font-size: 0.82rem; padding: 0.5rem 1rem;">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                            </svg>
+                                            Xóa Khuôn Mặt
+                                        </button>
+                                    </form>
+                                </div>
+                                <div th:if="${#lists.isEmpty(users)}" style="grid-column: 1 / -1; text-align: center; color: var(--text-dim); padding: 3rem;">
+                                    Chưa có khuôn mặt nào được đăng ký trong kho dữ liệu.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /bento-grid -->
+
+            </div><!-- /container -->
+        </main>
+    </div>
+
+</body>
+</html>

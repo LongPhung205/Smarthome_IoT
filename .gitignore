@@ -1,0 +1,68 @@
+# ==========================================
+# IDE & Code Editors
+# ==========================================
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+
+# ==========================================
+# Java / Spring Boot (Maven & Gradle)
+# ==========================================
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.mvn/wrapper/maven-wrapper.jar
+build/
+.gradle/
+
+# ==========================================
+# Python / AI Vision
+# ==========================================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+*.log
+
+# ==========================================
+# ESP32 / Arduino / PlatformIO
+# ==========================================
+.pio/
+.pioenvs/
+.piolibdeps/
+*.hex
+*.elf
+*.bin
+
+# ==========================================
+# Environment variables & secrets
+# ==========================================
+.env
+*.env.local
+*.env.*.local
+
+# ==========================================
+# Operating System Files
+# ==========================================
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*~

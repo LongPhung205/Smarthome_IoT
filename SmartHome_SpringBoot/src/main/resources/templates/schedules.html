@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lên Lịch Hẹn Giờ - SmartHome IoT</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v=2.1)}">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Flatpickr CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation Fragment -->
+        <div th:replace="~{fragments/sidebar :: sidebar('schedules')}"></div>
+        
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- TOP HEADER -->
+                <div class="top-welcome-bar">
+                    <div>
+                        <h1 class="welcome-title">Lên Lịch Tự Động Hóa Thiết Bị</h1>
+                        <p class="welcome-sub">Hẹn giờ bật/tắt thiết bị thông minh theo thời gian mong muốn.</p>
+                    </div>
+                </div>
+
+                <div class="bento-grid">
+                    <!-- Form Thêm Lịch Hẹn (COL 4) -->
+                    <div class="col-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Thêm Lịch Mới
+                                </span>
+                                <span class="tag tag-success">CRON Trigger</span>
+                            </div>
+
+                            <form id="scheduleForm" onsubmit="addSchedule(event)">
+                                <div class="form-group">
+                                    <label class="form-label" for="deviceName">Chọn Thiết Bị</label>
+                                    <select id="deviceName" class="form-control" required>
+                                        <option value="light">Đèn Chiếu Sáng</option>
+                                        <option value="fan">Quạt Làm Mát</option>
+                                        <option value="door">Cửa Chính (Servo)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="action">Hành Động</label>
+                                    <select id="action" class="form-control" required>
+                                        <option value="ON">BẬT (ON)</option>
+                                        <option value="OFF">TẮT (OFF)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="scheduleTime">Thời Gian Thực Thi (Ngày Giờ)</label>
+                                    <input type="text" id="scheduleTime" class="form-control font-mono" placeholder="Chọn ngày và giờ..." required>
+                                </div>
+                                <button type="submit" class="btn" style="margin-top: 0.5rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Lưu Lịch Hẹn
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách Lịch Hẹn (COL 8) -->
+                    <div class="col-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                                    </svg>
+                                    Danh Sách Lịch Hẹn
+                                </span>
+                                <button onclick="loadSchedules()" class="action-btn" title="Làm mới">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="log-table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Thiết Bị</th>
+                                            <th>Hành Động</th>
+                                            <th>Thời Gian</th>
+                                            <th>Trạng Thái</th>
+                                            <th>Thao Tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scheduleList">
+                                        <tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 3rem;">Đang tải dữ liệu...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /bento-grid -->
+
+            </div><!-- /container -->
+        </main>
+    </div>
+
+    <!-- Frontend Script -->
+    <script th:src="@{/js/schedules.js}"></script>
+</body>
+</html>

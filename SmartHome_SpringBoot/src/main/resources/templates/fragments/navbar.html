@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <nav th:fragment="navbar(activeTab)" class="navbar">
+        <a href="/dashboard" class="brand">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>SmartHome<span>.IoT</span></span>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a th:href="@{/dashboard}" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''">
+                    Bảng Điều Khiển
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/history}" th:classappend="${activeTab == 'history'} ? 'active' : ''">
+                    Nhật Ký & Lịch Sử
+                </a>
+            </li>
+        </ul>
+
+        <div class="nav-status">
+            <span id="navTime" style="font-size: 0.85rem; color: #94a3b8; font-variant-numeric: tabular-nums;">--:--:--</span>
+            <div id="mqttBadge" class="badge" th:classappend="${mqttConnected} ? 'badge-connected' : 'badge-disconnected'">
+                <span class="status-dot"></span>
+                <span id="mqttStatusText" th:text="${mqttConnected} ? 'Mosquitto: Online' : 'Mosquitto: Sẵn sàng'">Mosquitto</span>
+            </div>
+        </div>
+
+        <script>
+            // Hiển thị đồng hồ thời gian thực
+            function updateClock() {
+                const now = new Date();
+                const timeEl = document.getElementById('navTime');
+                if (timeEl) {
+                    timeEl.innerText = now.toLocaleTimeString('vi-VN');
+                }
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+        </script>
+    </nav>
+</body>
+</html>

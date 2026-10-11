@@ -1,0 +1,1040 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   TASTE-SKILL-V1 DESIGN SYSTEM TOKENS - LUMINOUS LIGHT THEME
+   - Variance: 8 (Asymmetric Bento Grid)
+   - Motion: 6 (Fluid Springs & Tactile Feedback)
+   - Density: 4 (Airy, Luminous White Glass Surfaces)
+   ========================================================================== */
+
+:root {
+    /* Typography Stacks */
+    --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Fresh Luminous Palette */
+    --bg-base: #f8fafc;
+    --bg-subtle: #f1f5f9;
+    --bg-card: rgba(255, 255, 255, 0.92);
+    --bg-card-hover: #ffffff;
+    --bg-card-elevated: #ffffff;
+
+    /* Liquid Glass & Borders */
+    --border-glass: rgba(226, 232, 240, 0.85);
+    --border-glass-subtle: rgba(226, 232, 240, 0.6);
+    --border-glass-hover: rgba(14, 165, 233, 0.45);
+    --border-active: #0284c7;
+
+    /* Single Calibrated Accent & Functional Status Hues */
+    --accent-primary: #0284c7;
+    --accent-glow: rgba(14, 165, 233, 0.15);
+    --accent-cyan: #0284c7;
+    --status-success: #059669;
+    --status-warning: #d97706;
+    --status-danger: #e11d48;
+    
+    /* Text Hierarchy */
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --text-dim: #94a3b8;
+    --text-inverse: #ffffff;
+
+    /* Radii & Elevation */
+    --radius-2xl: 24px;
+    --radius-xl: 18px;
+    --radius-lg: 14px;
+    --radius-md: 10px;
+    --radius-full: 9999px;
+
+    /* Diffusion Shadows & Inner Refraction (Crisp for Light Mode) */
+    --shadow-diffusion: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+    --shadow-diffusion-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.07), 0 8px 12px -4px rgba(15, 23, 42, 0.03);
+    --shadow-inner-refract: inset 0 1px 0 0 rgba(255, 255, 255, 1), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-accent-glow: 0 6px 20px rgba(2, 132, 199, 0.25);
+
+    /* Animation Curve */
+    --spring-physics: cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: 0.2s var(--spring-physics);
+    --transition-smooth: 0.35s var(--spring-physics);
+}
+
+/* ==========================================================================
+   RESET & FOUNDATION
+   ========================================================================== */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: var(--bg-base);
+    background-image: 
+        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 88% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(241, 245, 249, 0.5) 0%, transparent 100%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    min-height: 100dvh;
+    overflow-x: hidden;
+}
+
+/* Monospace numerals */
+.font-mono, .sensor-num, .time-display, .metric-val, table td:first-child {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Display headings */
+h1, h2, h3, h4, .brand-text, .card-title {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   LAYOUT STRUCTURE (Min-h 100dvh & Sidebar)
+   ========================================================================== */
+
+.app-layout {
+    display: flex;
+    min-height: 100dvh;
+    width: 100%;
+    position: relative;
+}
+
+/* SIDEBAR: Frosted Luminous Glass Dock */
+.sidebar {
+    width: 270px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-right: 1px solid var(--border-glass);
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.03);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    transition: var(--transition-smooth);
+}
+
+.sidebar-header {
+    padding: 1.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-glass-subtle);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(16, 185, 129, 0.1));
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-cyan);
+    box-shadow: var(--shadow-inner-refract);
+}
+
+.brand-text {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.brand-text span {
+    color: var(--accent-cyan);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.sidebar-menu {
+    flex: 1;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    list-style: none;
+    overflow-y: auto;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 1.15rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    transition: var(--transition-fast);
+    position: relative;
+}
+
+.sidebar-menu a svg {
+    color: var(--text-dim);
+    transition: var(--transition-fast);
+}
+
+.sidebar-menu a:hover {
+    color: var(--text-main);
+    background: rgba(14, 165, 233, 0.05);
+    border-color: rgba(14, 165, 233, 0.15);
+    transform: translateX(4px);
+}
+
+.sidebar-menu a:hover svg {
+    color: var(--accent-cyan);
+}
+
+.sidebar-menu a.active {
+    color: var(--accent-cyan);
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.12) 0%, rgba(14, 165, 233, 0.03) 100%);
+    border-color: rgba(14, 165, 233, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+}
+
+.sidebar-menu a.active svg {
+    color: var(--accent-cyan);
+}
+
+.sidebar-menu a.active::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 22px;
+    border-radius: var(--radius-full);
+    background: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+}
+
+.sidebar-footer {
+    padding: 1.25rem;
+    border-top: 1px solid var(--border-glass-subtle);
+    background: rgba(248, 250, 252, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* MAIN CONTENT AREA */
+.main-content {
+    flex: 1;
+    margin-left: 270px;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 270px);
+    min-height: 100dvh;
+    padding-bottom: 3rem;
+}
+
+.container {
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2.25rem 2.5rem;
+}
+
+/* ==========================================================================
+   TOP BAR / WELCOME BANNER
+   ========================================================================== */
+
+.top-welcome-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.welcome-title {
+    font-size: 2.15rem;
+    color: var(--text-main);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+}
+
+.welcome-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+.user-badge-name {
+    color: var(--accent-cyan);
+    font-weight: 600;
+}
+
+.top-pills-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.system-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   BENTO GRID 2.0 (Asymmetric Architecture - Variance: 8)
+   ========================================================================== */
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+}
+
+.col-12 { grid-column: span 12; }
+.col-8  { grid-column: span 8; }
+.col-7  { grid-column: span 7; }
+.col-6  { grid-column: span 6; }
+.col-5  { grid-column: span 5; }
+.col-4  { grid-column: span 4; }
+.col-3  { grid-column: span 3; }
+
+/* BENTO CARD CONTAINER (Luminous Liquid Glass) */
+.card, .bento-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-2xl);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-inner-refract), var(--shadow-diffusion);
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover, .bento-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-glass-hover);
+    box-shadow: var(--shadow-inner-refract), var(--shadow-diffusion-lg), 0 0 25px rgba(14, 165, 233, 0.08);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border-glass-subtle);
+}
+
+.card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.card-title i, .card-title svg {
+    color: var(--accent-cyan);
+}
+
+/* ==========================================================================
+   HERO COMMAND CARD: GAS MONITOR & AUTO-MITIGATION
+   ========================================================================== */
+
+.hero-gas-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.9) 100%);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.hero-gas-card.gas-alert {
+    background: linear-gradient(135deg, rgba(255, 241, 242, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border-color: rgba(244, 63, 94, 0.45);
+    box-shadow: 0 0 35px rgba(244, 63, 94, 0.2);
+}
+
+.gas-metric-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.gas-main-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.gas-value-large {
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text-main);
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.gas-unit-tag {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    letter-spacing: 0.05em;
+}
+
+.gas-status-details {
+    flex: 1;
+    min-width: 280px;
+    padding-left: 2rem;
+    border-left: 1px solid var(--border-glass);
+}
+
+.auto-mitigation-box {
+    margin-top: 1rem;
+    background: rgba(241, 245, 249, 0.8);
+    border: 1px solid var(--border-glass-subtle);
+    border-radius: var(--radius-lg);
+    padding: 0.85rem 1.15rem;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.auto-mitigation-box strong {
+    color: var(--text-main);
+}
+
+/* ==========================================================================
+   DEVICE CONTROLS & PHYSICAL TACTILE SWITCHES
+   ========================================================================== */
+
+.device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.device-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.1rem 1.25rem;
+    background: rgba(248, 250, 252, 0.85);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-xl);
+    transition: var(--transition-smooth);
+}
+
+.device-item:hover {
+    background: #ffffff;
+    border-color: var(--border-glass-hover);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.device-item.active {
+    background: linear-gradient(90deg, rgba(240, 249, 255, 0.95) 0%, #ffffff 100%);
+    border-color: rgba(14, 165, 233, 0.35);
+    box-shadow: 0 2px 10px rgba(14, 165, 233, 0.08);
+}
+
+.device-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.device-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    background: rgba(241, 245, 249, 0.9);
+    border: 1px solid var(--border-glass);
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.device-item.active .device-icon {
+    background: rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.3);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+}
+
+.device-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--text-main);
+}
+
+.device-status {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-top: 0.15rem;
+}
+
+.device-item.active .device-status {
+    color: var(--accent-cyan);
+    font-weight: 600;
+}
+
+/* HIGH-AGENCY TACTILE SWITCH */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 56px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #cbd5e1;
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    border-radius: var(--radius-full);
+    transition: var(--transition-smooth);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+    transition: transform 0.35s var(--spring-physics), background-color 0.2s ease;
+}
+
+/* Active switch state */
+input:checked + .slider {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 14px rgba(2, 132, 199, 0.35);
+}
+
+input:checked + .slider::before {
+    transform: translateX(26px);
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tactile Feedback on active click */
+.switch:active .slider::before {
+    width: 26px;
+}
+
+/* ==========================================================================
+   AI LIVE CAMERA FRAME & SCANNER
+   ========================================================================== */
+
+.camera-monitor-bezel {
+    width: 100%;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--border-glass);
+    background: #090d16;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.camera-feed-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.camera-live-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #f8fafc;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.live-indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+    animation: breathingDot 1.5s infinite;
+}
+
+.ai-meta-panel {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.ai-face-name {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    letter-spacing: -0.02em;
+}
+
+.ai-face-status {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+/* TACTILE ACTION BUTTONS */
+.btn, .btn-action {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    padding: 0.85rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: var(--transition-fast);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25), var(--shadow-inner-refract);
+    text-decoration: none;
+    width: 100%;
+}
+
+.btn:hover, .btn-action:hover {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35), var(--shadow-inner-refract);
+    transform: translateY(-1px);
+}
+
+.btn:active, .btn-action:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================================================
+   VOICE ASSISTANT WIDGET
+   ========================================================================== */
+
+.voice-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.5rem 0;
+    text-align: center;
+}
+
+.mic-btn {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(2, 132, 199, 0.3);
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.mic-btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 12px 30px rgba(14, 165, 233, 0.4);
+}
+
+.mic-btn:active {
+    transform: scale(0.95);
+}
+
+.mic-btn.listening {
+    background: radial-gradient(circle at 35% 35%, #f43f5e 0%, #e11d48 60%, #9f1239 100%);
+    border-color: rgba(255, 255, 255, 0.9);
+    animation: pulseMic 1.5s infinite;
+}
+
+@keyframes pulseMic {
+    0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+    70% { box-shadow: 0 0 0 22px rgba(244, 63, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+}
+
+.voice-status {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.voice-transcript {
+    background: rgba(240, 249, 255, 0.85);
+    border: 1px dashed rgba(14, 165, 233, 0.4);
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    font-size: 0.88rem;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-cyan);
+    font-weight: 500;
+}
+
+.voice-hints {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-align: left;
+    width: 100%;
+    background: rgba(248, 250, 252, 0.85);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-glass);
+}
+
+.voice-hints ul {
+    margin-left: 1.2rem;
+    margin-top: 0.4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+}
+
+/* ==========================================================================
+   DATA TABLES (Tối Giản, Không Lạm Dụng Card, Monospace Numerals)
+   ========================================================================== */
+
+.log-table-container {
+    overflow-x: auto;
+    width: 100%;
+    max-height: 440px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+th, td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-glass-subtle);
+}
+
+th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(248, 250, 252, 0.95);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(12px);
+    z-index: 10;
+}
+
+tr:hover td {
+    background: rgba(241, 245, 249, 0.6);
+}
+
+/* STATUS TAGS & BADGES (High-Contrast & Vibrant on Light) */
+.tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.02em;
+}
+
+.tag-success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.tag-warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.tag-denied {
+    background: rgba(244, 63, 94, 0.12);
+    color: #be123c;
+    border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.badge {
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid transparent;
+}
+
+.badge-connected {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+.badge-disconnected {
+    background: rgba(244, 63, 94, 0.12);
+    color: #be123c;
+    border-color: rgba(244, 63, 94, 0.25);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+    animation: breathingDot 2s infinite;
+}
+
+@keyframes breathingDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN BREAKPOINTS (Mobile Collapse Rule)
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+    .col-8 { grid-column: span 12; }
+    .col-7 { grid-column: span 12; }
+    .col-5 { grid-column: span 12; }
+    .col-4 { grid-column: span 6; }
+    .col-3 { grid-column: span 6; }
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .container {
+        padding: 1.5rem 1rem;
+    }
+
+    .col-4, .col-3, .col-6 {
+        grid-column: span 12;
+    }
+
+    .gas-status-details {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border-glass);
+        padding-top: 1.5rem;
+    }
+}
+
+/* ==========================================================================
+   FORM CONTROLS & INPUTS (Rule 6: Label above input, 8px gap)
+   ========================================================================== */
+
+.form-group {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label, label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+.form-control, select, input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-lg);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.form-control:focus, select:focus, input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    background: #ffffff;
+}
+
+select option {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+/* TABLE ACTION BUTTONS */
+.action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    color: var(--text-main);
+    background: rgba(15, 23, 42, 0.06);
+    transform: scale(1.08);
+}
+
+.btn-delete:hover {
+    color: var(--status-danger) !important;
+    background: rgba(244, 63, 94, 0.12) !important;
+}
+
+.btn-toggle.active {
+    color: var(--status-success);
+}
+
+/* USER / FACE MANAGEMENT GRID */
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.user-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+    position: relative;
+    box-shadow: var(--shadow-inner-refract), var(--shadow-diffusion);
+    transition: var(--transition-smooth);
+}
+
+.user-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-glass-hover);
+    box-shadow: var(--shadow-inner-refract), var(--shadow-diffusion-lg), 0 0 20px rgba(14, 165, 233, 0.12);
+}
+
+.user-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1.2rem auto;
+    border: 3px solid rgba(14, 165, 233, 0.35);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.1);
+}
+
+.user-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}

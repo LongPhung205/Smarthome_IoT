@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head></head>
+<body>
+    <aside th:fragment="sidebar(activeTab)" class="sidebar">
+        <!-- Brand Header -->
+        <div class="sidebar-header">
+            <div class="brand-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                SmartHome
+                <span>IoT Command</span>
+            </div>
+        </div>
+
+        <!-- Navigation Menu Items -->
+        <ul class="sidebar-menu">
+            <li>
+                <a th:href="@{/dashboard}" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="7" height="9" x="3" y="3" rx="1"/>
+                        <rect width="7" height="5" x="14" y="3" rx="1"/>
+                        <rect width="7" height="9" x="14" y="12" rx="1"/>
+                        <rect width="7" height="5" x="3" y="16" rx="1"/>
+                    </svg>
+                    <span>Bảng Điều Khiển</span>
+                </a>
+            </li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/schedules}" th:classappend="${activeTab == 'schedules'} ? 'active' : ''">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Lên Lịch Hẹn Giờ</span>
+                </a>
+            </li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/users}" th:classappend="${activeTab == 'admin_users'} ? 'active' : ''">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <span>Quản Lý Tài Khoản</span>
+                </a>
+            </li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/users}" th:classappend="${activeTab == 'users'} ? 'active' : ''">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span>Dữ Liệu Khuôn Mặt</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/intruders}" th:classappend="${activeTab == 'intruders'} ? 'active' : ''">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <circle cx="12" cy="11" r="3"/>
+                    </svg>
+                    <span>Nhật Ký Người Lạ</span>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/history}" th:classappend="${activeTab == 'history'} ? 'active' : ''">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                        <path d="M12 7v5l4 2"/>
+                    </svg>
+                    <span>Nhật Ký & Lịch Sử</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Sidebar Footer & Realtime Health -->
+        <div class="sidebar-footer">
+            <!-- User Profile & Logout -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);">
+                <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(56, 189, 248, 0.08)); border: 1px solid rgba(14, 165, 233, 0.25); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: var(--accent-cyan); flex-shrink: 0;">
+                        <span sec:authentication="name" th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
+                    </div>
+                    <div style="min-width: 0;">
+                        <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" sec:authentication="name">User</div>
+                        <div style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 500;" sec:authorize="hasRole('ADMIN')">Administrator</div>
+                        <div style="font-size: 0.72rem; color: var(--text-dim);" sec:authorize="!hasRole('ADMIN')">Member</div>
+                    </div>
+                </div>
+                <a th:href="@{/logout}" title="Đăng xuất" style="color: var(--text-dim); padding: 0.4rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);" onmouseover="this.style.color='#f43f5e'; this.style.background='rgba(244,63,94,0.1)'" onmouseout="this.style.color='var(--text-dim)'; this.style.background='transparent'">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- MQTT Status Badge -->
+            <div id="mqttBadge" class="badge" th:classappend="${mqttConnected} ? 'badge-connected' : 'badge-disconnected'" style="width: 100%; justify-content: center; padding: 0.55rem; font-size: 0.8rem;">
+                <span class="status-dot"></span>
+                <span id="mqttStatusText" th:text="${mqttConnected} ? 'MQTT Broker: Online' : 'MQTT Broker: Sẵn sàng'">Mosquitto</span>
+            </div>
+
+            <!-- Monospace Digital Clock -->
+            <div id="navTime" class="time-display" style="font-size: 0.85rem; color: var(--text-muted); text-align: center; font-variant-numeric: tabular-nums; letter-spacing: 0.05em;">--:--:--</div>
+        </div>
+
+        <script>
+            // Đồng hồ thời gian thực phong cách Monospace
+            function updateClock() {
+                const now = new Date();
+                const timeEl = document.getElementById('navTime');
+                if (timeEl) {
+                    timeEl.innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
+                }
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+        </script>
+    </aside>
+</body>
+</html>

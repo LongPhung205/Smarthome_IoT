@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhật Ký Người Lạ - SmartHome IoT</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v=2.1)}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .intruder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+        .intruder-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+        }
+        .intruder-img-container {
+            width: 100%;
+            height: 200px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .intruder-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .intruder-info {
+            padding: 1rem;
+        }
+        .intruder-time {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            margin-bottom: 0.5rem;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .filter-btn.active {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--status-danger);
+            border-color: var(--status-danger);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation Fragment -->
+        <div th:replace="~{fragments/sidebar :: sidebar('intruders')}"></div>
+
+        <main class="main-content">
+            <div class="container">
+                
+                <!-- TOP HEADER -->
+                <div class="top-welcome-bar">
+                    <div>
+                        <h1 class="welcome-title">Nhật Ký Người Lạ</h1>
+                        <p class="welcome-sub">Theo dõi hình ảnh những người lạ không có trong dữ liệu khuôn mặt đã bị camera ghi lại.</p>
+                    </div>
+                </div>
+
+                <div class="bento-grid">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <circle cx="12" cy="11" r="3"/>
+                                    </svg>
+                                    Danh Sách Phát Hiện
+                                </span>
+                                <span class="tag tag-denied" th:text="${#lists.size(intrudersList)} + ' Bản ghi'">5 Bản ghi</span>
+                            </div>
+
+                            <div style="padding: 1rem;">
+                                <!-- Client-side filtering -->
+                                <div class="filter-buttons">
+                                    <button class="filter-btn active" onclick="filterData('all')">Tất cả</button>
+                                    <button class="filter-btn" onclick="filterData('today')">Hôm nay</button>
+                                    <button class="filter-btn" onclick="filterData('7days')">7 ngày qua</button>
+                                    <button class="filter-btn" onclick="filterData('30days')">30 ngày qua</button>
+                                </div>
+
+                                <div class="intruder-grid" id="intruderGrid">
+                                    <div class="intruder-card" th:each="item : ${intrudersList}" th:attr="data-timestamp=${item.timestamp}">
+                                        <div class="intruder-img-container">
+                                            <img class="intruder-img" th:src="${item.imageUrl}" alt="Ảnh người lạ" onerror="this.src='/images/camera_offline.png';">
+                                        </div>
+                                        <div class="intruder-info" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                            <div>
+                                                <div class="intruder-time" th:text="${#temporals.format(item.timestamp, 'HH:mm:ss - dd/MM/yyyy')}">10:20:00 - 04/09/2026</div>
+                                                <div style="font-weight: 600; font-size: 0.95rem; color: var(--status-danger);">Phát hiện xâm nhập</div>
+                                            </div>
+                                            <button th:onclick="'deleteIntruder(' + ${item.id} + ')'" title="Xóa nhật ký này" style="background: transparent; border: none; cursor: pointer; color: var(--text-dim); padding: 5px;">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='currentColor'">
+                                                    <path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div th:if="${#lists.isEmpty(intrudersList)}" style="grid-column: 1 / -1; text-align: center; color: var(--text-dim); padding: 3rem;">
+                                        Chưa ghi nhận người lạ nào.
+                                    </div>
+                                    <div id="emptyFilterMsg" style="display: none; grid-column: 1 / -1; text-align: center; color: var(--text-dim); padding: 3rem;">
+                                        Không có dữ liệu trong khoảng thời gian này.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /bento-grid -->
+
+            </div><!-- /container -->
+        </main>
+    </div>
+
+    <script>
+        function filterData(period) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const now = new Date();
+            let limitDate = new Date();
+
+            if (period === 'today') {
+                limitDate.setHours(0, 0, 0, 0);
+            } else if (period === '7days') {
+                limitDate.setDate(now.getDate() - 7);
+            } else if (period === '30days') {
+                limitDate.setDate(now.getDate() - 30);
+            } else {
+                limitDate = new Date(0); // All time
+            }
+
+            const cards = document.querySelectorAll('.intruder-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const tsString = card.getAttribute('data-timestamp');
+                const cardDate = new Date(tsString);
+                
+                if (cardDate >= limitDate) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const emptyMsg = document.getElementById('emptyFilterMsg');
+            if (cards.length > 0) {
+                emptyMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        }
+
+        async function deleteIntruder(id) {
+            const result = await Swal.fire({
+                title: 'Xóa nhật ký này?',
+                text: "Hành động này sẽ xóa ảnh và ghi log lại hệ thống!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('/api/intruders/' + id, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        Swal.fire('Đã xóa!', 'Nhật ký đã được xóa.', 'success')
+                        .then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Lỗi!', data.message || 'Không thể xóa nhật ký.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ.', 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
